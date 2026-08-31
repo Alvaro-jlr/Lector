@@ -36,4 +36,8 @@ interface ObraDao {
         idioma: String? = null,
         estado: EstadoLectura? = null
     ): Flow<List<Obra>>
+
+    @Query("UPDATE obras SET estado = :estado WHERE id = :obraId")
+    suspend fun actualizarEstado(obraId: Long, estado: EstadoLectura)
 }
+

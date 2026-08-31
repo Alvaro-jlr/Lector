@@ -14,6 +14,7 @@ data class LibraryFiltro(
     val categoriaId: Long? = null
 )
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class ObraViewModel(application: Application) : AndroidViewModel(application) {
 
     private val obraDao = AppDatabase.obtenerInstancia(application).obraDao()
@@ -89,5 +90,9 @@ class ObraViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             categoriaDao.quitarObraDeCategoria(obraId, categoriaId)
         }
+    }
+
+    fun actualizarEstado(obraId: Long, estado: EstadoLectura) {
+        viewModelScope.launch { obraDao.actualizarEstado(obraId, estado) }
     }
 }

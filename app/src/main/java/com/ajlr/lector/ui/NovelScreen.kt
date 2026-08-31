@@ -118,14 +118,29 @@ fun ObraCard(obra: Obra, viewModel: ObraViewModel, esNovela: Boolean) {
                 Text(obra.titulo, style = MaterialTheme.typography.titleMedium)
                 Text(obra.tipo.name, style = MaterialTheme.typography.bodySmall)
                 Text("Capítulo ${obra.capituloActual}", style = MaterialTheme.typography.bodySmall)
+
+                if (esNovela) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    FilterChip(
+                        selected = obra.estado == EstadoLectura.Leyendo,
+                        onClick = {
+                            val nuevoEstado = if (obra.estado == EstadoLectura.Leyendo)
+                                EstadoLectura.Pendiente else EstadoLectura.Leyendo
+                            viewModel.actualizarEstado(obra.id, nuevoEstado)
+                        },
+                        label = { Text(obra.estado.name) }
+                    )
+                }
             }
-            IconButton(onClick = { mostrarDialogoAsignar = true }) {
-                Icon(Icons.Default.Bookmark, contentDescription = "Asignar a categoría")
+            if (!esNovela) {
+                IconButton(onClick = { mostrarDialogoAsignar = true }) {
+                    Icon(Icons.Default.Bookmark, contentDescription = "Asignar a categoría")
+                }
             }
         }
     }
 
-    if (mostrarDialogoAsignar) {
+    if (mostrarDialogoAsignar && !esNovela) {
         val categorias by viewModel.categoriasFiltradas(esNovela).collectAsState(initial = emptyList())
         val categoriaIdsAsignadas by viewModel.obtenerCategoriaIdsDeObra(obra.id)
             .collectAsState(initial = emptyList())
