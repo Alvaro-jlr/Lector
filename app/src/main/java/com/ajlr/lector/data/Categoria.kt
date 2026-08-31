@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 data class Categoria(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val nombre: String,
-    val orden: Int = 0
+    val orden: Int = 0,
+    val esParaNovelas: Boolean = false
 )
-
 @Entity(tableName = "obra_categoria", primaryKeys = ["obraId", "categoriaId"])
 data class ObraCategoriaCrossRef(
     val obraId: Long,

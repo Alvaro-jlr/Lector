@@ -28,4 +28,10 @@ interface CategoriaDao {
         ORDER BY obras.titulo ASC
     """)
     fun obtenerObrasDeCategoria(categoriaId: Long): Flow<List<Obra>>
+
+    @Query("SELECT categoriaId FROM obra_categoria WHERE obraId = :obraId")
+    fun obtenerCategoriaIdsDeObra(obraId: Long): Flow<List<Long>>
+
+    @Query("SELECT * FROM categorias WHERE esParaNovelas = :esNovela ORDER BY orden ASC")
+    fun obtenerPorTipo(esNovela: Boolean): Flow<List<Categoria>>
 }

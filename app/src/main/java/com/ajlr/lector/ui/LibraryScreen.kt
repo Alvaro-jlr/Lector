@@ -28,7 +28,7 @@ fun LibraryScreen(viewModel: ObraViewModel) {
     }
 
     val obras by viewModel.obras.collectAsState()
-    val categorias by viewModel.categorias.collectAsState()
+    val categorias by viewModel.categoriasFiltradas(esNovela = false).collectAsState(initial = emptyList())
     val filtro by viewModel.filtro.collectAsState()
     var mostrarDialogoCategoria by remember { mutableStateOf(false) }
 
@@ -93,7 +93,7 @@ fun LibraryScreen(viewModel: ObraViewModel) {
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(obras, key = { it.id }) { obra ->
-                        ObraCard(obra)
+                        ObraCard(obra, viewModel, esNovela = false)
                     }
                 }
             }
@@ -116,7 +116,7 @@ fun LibraryScreen(viewModel: ObraViewModel) {
             confirmButton = {
                 TextButton(onClick = {
                     if (nombreNuevaCategoria.isNotBlank()) {
-                        viewModel.crearCategoria(nombreNuevaCategoria)
+                        viewModel.crearCategoria(nombreNuevaCategoria, esParaNovelas = false)
                     }
                     mostrarDialogoCategoria = false
                 }) { Text("Crear") }

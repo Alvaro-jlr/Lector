@@ -67,9 +67,27 @@ class ObraViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { obraDao.actualizarCapitulo(obraId, capitulo) }
     }
 
-    fun crearCategoria(nombre: String) {
+    fun categoriasFiltradas(esNovela: Boolean): Flow<List<Categoria>> =
+        categoriaDao.obtenerPorTipo(esNovela)
+
+    fun crearCategoria(nombre: String, esParaNovelas: Boolean) {
         viewModelScope.launch {
-            categoriaDao.insertar(Categoria(nombre = nombre, orden = categorias.value.size))
+            categoriaDao.insertar(Categoria(nombre = nombre, orden = categorias.value.size, esParaNovelas = esParaNovelas))
+        }
+    }
+
+    fun obtenerCategoriaIdsDeObra(obraId: Long): Flow<List<Long>> =
+        categoriaDao.obtenerCategoriaIdsDeObra(obraId)
+
+    fun asignarACategoria(obraId: Long, categoriaId: Long) {
+        viewModelScope.launch {
+            categoriaDao.asignarObraACategoria(ObraCategoriaCrossRef(obraId, categoriaId))
+        }
+    }
+
+    fun quitarDeCategoria(obraId: Long, categoriaId: Long) {
+        viewModelScope.launch {
+            categoriaDao.quitarObraDeCategoria(obraId, categoriaId)
         }
     }
 }

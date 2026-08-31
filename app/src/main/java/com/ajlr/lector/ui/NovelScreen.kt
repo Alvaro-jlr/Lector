@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,7 +86,7 @@ fun NovelScreen(viewModel: ObraViewModel) {
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(obras, key = { it.id }) { obra ->
-                        ObraCard(obra)
+                        ObraCard(obra, viewModel, esNovela = true)
                     }
                 }
             }
@@ -94,7 +95,9 @@ fun NovelScreen(viewModel: ObraViewModel) {
 }
 
 @Composable
-fun ObraCard(obra: Obra) {
+fun ObraCard(obra: Obra, viewModel: ObraViewModel, esNovela: Boolean) {
+    var mostrarDialogoAsignar by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -111,11 +114,54 @@ fun ObraCard(obra: Obra) {
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(12.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(obra.titulo, style = MaterialTheme.typography.titleMedium)
                 Text(obra.tipo.name, style = MaterialTheme.typography.bodySmall)
                 Text("Capítulo ${obra.capituloActual}", style = MaterialTheme.typography.bodySmall)
             }
+            IconButton(onClick = { mostrarDialogoAsignar = true }) {
+                Icon(Icons.Default.Bookmark, contentDescription = "Asignar a categoría")
+            }
         }
+    }
+
+    if (mostrarDialogoAsignar) {
+        val categorias by viewModel.categoriasFiltradas(esNovela).collectAsState(initial = emptyList())
+        val categoriaIdsAsignadas by viewModel.obtenerCategoriaIdsDeObra(obra.id)
+            .collectAsState(initial = emptyList())
+
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoAsignar = false },
+            title = { Text("Asignar a categorías") },
+            text = {
+                Column {
+                    if (categorias.isEmpty()) {
+                        Text("Todavía no tienes categorías creadas.")
+                    }
+                    categorias.forEach { categoria ->
+                        val asignada = categoria.id in categoriaIdsAsignadas
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Checkbox(
+                                checked = asignada,
+                                onCheckedChange = { marcado ->
+                                    if (marcado) {
+                                        viewModel.asignarACategoria(obra.id, categoria.id)
+                                    } else {
+                                        viewModel.quitarDeCategoria(obra.id, categoria.id)
+                                    }
+                                }
+                            )
+                            Text(categoria.nombre)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { mostrarDialogoAsignar = false }) { Text("Listo") }
+            }
+        )
     }
 }

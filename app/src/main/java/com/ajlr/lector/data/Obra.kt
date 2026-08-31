@@ -9,7 +9,7 @@ enum class TipoObra {
 }
 
 enum class EstadoLectura {
-    Leyendo, Completado, Pausado, Pendiente
+    Leyendo, Pendiente
 }
 
 @Entity(tableName = "obras")
